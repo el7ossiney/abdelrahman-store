@@ -28,10 +28,10 @@
       <textarea name="description" class="form-control">{{$category->description}}</textarea>
     </div>
 
-    <div class="mb-3">
+    {{-- <div class="mb-3">
         <label for="formFile" class="form-label">Image</label>
         <input class="form-control" type="file" id="formFile">
-      </div>
+      </div> --}}
       <div class="form-check">
         <input class="form-check-input" type="radio" name="status" value="active" id="flexCheckDefault" checked>
         <label class="form-check-label" for="flexCheckDefault">
