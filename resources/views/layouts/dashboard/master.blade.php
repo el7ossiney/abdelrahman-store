@@ -23,7 +23,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <div class="wrapper">
 
         <!-- Navbar -->
-        @include('layouts.dashboard.partials.nav    ')
+        @include('layouts.dashboard.partials.nav')
         <!-- /.navbar -->
 
         <!-- Main Sidebar Container -->
@@ -46,6 +46,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </div>
                         <div class="info">
                             <a href="#" class="d-block">{{ Auth::user()->name }}</a>
+                        </div>
+                        <div class="info">
+                            <form action="{{route('logout')}}" method="post">
+                                @csrf
+                                <button  type="submit" class="d-block btn btn-sm btn-outline-info">logout</button>
+                            </form>
                         </div>
                     </div>
                 @endauth
@@ -119,10 +125,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                            
+
                                 @section('breadcrumb')
-                                    
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+
+                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
                                 @show
                             </ol>
                         </div><!-- /.col -->

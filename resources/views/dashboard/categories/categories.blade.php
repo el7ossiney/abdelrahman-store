@@ -10,7 +10,10 @@
     <div class="mt-4 mb-2">
         <a class="btn btn-outline-success" href="{{route('categories.create')}}">Create</a>
     </div>
-    <table class="table">
+    <x-alert type='success' />
+    <x-alert type='info' />
+    <x-alert type='danger' />
+      <table class="table">
 
         <thead>
           <tr>
@@ -18,10 +21,10 @@
             <th scope="col">Name</th>
             <th scope="col">Parent</th>
             <th scope="col">Created_At</th> 
-            <th scope="col"></th> 
+            <th scope="col">Actions</th> 
           </tr>
         </thead>
-        @forelse ($data as $data)
+        @forelse ($datas as $data)
 
         <tbody>
           <tr>
@@ -42,11 +45,11 @@
 
           </tr>
         </tbody>
-
         @empty
-
-            <th colspan="7">No Data Defined.</th>
-
+        
+        <th colspan="7">No Data Defined.</th>
+        
         @endforelse
       </table>  
-@endsection
+      {{$datas->links()}}
+      @endsection

@@ -6,27 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\User;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class CategoriesController extends Controller implements HasMiddleware
+class CategoriesController extends Controller
 {
 
-    public static function middleware()
-    {
-        return [
-            new Middleware('auth',except:['index']) 
-        ];
-    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $data = Category::all();
-        return view('dashboard.categories.categories',['data'=>$data]);
+        $datas = Category::paginate(2);
+        return view('dashboard.categories.categories', compact('datas'));
     }
 
     /**
@@ -34,9 +31,9 @@ class CategoriesController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        
+
         $parent = Category::all();
-        return view('dashboard.categories.create',compact('parent'));
+        return view('dashboard.categories.create', compact('parent'));
     }
 
     /**
@@ -44,24 +41,25 @@ class CategoriesController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
+        $request->validate(Category::rules());
         $request->merge([
-            'slug'=>Str::slug($request->name)
+            'slug' => Str::slug($request->name)
         ]);
         $data = $request->except('image');
-        
-        if($request->hasFile('image')){
-            $file =$request->file('image');
-            $path = $file->store('uploads',['disk'=>'public']);
-            $data['image']= $path;
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('uploads', ['disk' => 'public']);
+            $data['image'] = $path;
         }
 
         Category::create([
-            'name'=> $data['name'],
+            'name' => $data['name'],
             'description' => $data['description'],
-            'parent_id' =>$data['parent_id'],
+            'parent_id' => $data['parent_id'],
             'slug' => $data['slug']
         ]);
-        return redirect('categories')->with('success','category added successed');
+        return redirect('categories')->with('success', 'category added successed');
     }
 
     /**
@@ -75,22 +73,32 @@ class CategoriesController extends Controller implements HasMiddleware
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Category $category)
+    public function edit(string $id)
     {
-        try{$category;}
-        catch(Exception $e){
-            return redirect()->route('dashboard.categoires.categories')->with('info','the record not found!');
+        try {
+            $category = Category::findOrFail($id);  // This replaces route model binding
+        } catch (ModelNotFoundException $e) {
+            return redirect('categories')->with('info', 'The record was not found!');
         }
-        
-        return view('dashboard.categories.edit',compact('category','parent'));
-    }
 
+        $parent = Category::all();
+
+        return view('dashboard.categories.edit', compact('category', 'parent'));
+    }
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate(Category::rules());
+        $data = Category::find($id);
+        $data->update([
+            'name' => $request->name,
+            'parent_id' => $request->parent_id,
+            'description' => $request->description,
+            
+        ]);
+        return to_route('categories.index');
     }
 
     /**
@@ -98,7 +106,7 @@ class CategoriesController extends Controller implements HasMiddleware
      */
     public function destroy(Category $category)
     {
-            $category->delete();
-            return redirect()->route('categories.index');
+        $category->delete();
+        return redirect()->route('categories.index')->with('danger','Category deleted');
     }
 }
